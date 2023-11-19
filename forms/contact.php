@@ -15,6 +15,7 @@ $headers .= "MIME-Version: 1.0\r\n";
 $headers .= "Content-Type: text/html; charset=utf-8\r\n";
 
 if(mail($email, $name, $subject, $message, $headers)){
+	mail($email, $name, $subject, $message, $headers);
 	echo "email correctly sent";
 } else{
 		$errorMessage = error_get_last()['message'];
