@@ -4,8 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta name="color-scheme" content="light dark">
 
-  <title>Portfolio Details - Personal Bootstrap Template</title>
+  <title>RuteMe - Portfolio Details</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
@@ -14,6 +15,8 @@
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
@@ -27,6 +30,15 @@
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 
+  <script>
+    (function () {
+      var stored = null;
+      try { stored = localStorage.getItem('theme'); } catch (e) {}
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+    })();
+  </script>
+
   <!-- =======================================================
   * Template Name: MyResume - v4.10.0
   * Template URL: https://bootstrapmade.com/free-html-bootstrap-template-my-resume/
@@ -36,6 +48,12 @@
 </head>
 
 <body>
+
+  <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+    <i class="bi bi-moon-stars"></i>
+  </button>
+
+  <a href="index.html" class="btn-back"><i class="bi bi-arrow-left"></i> Back to portfolio</a>
 
   <main id="main">
 

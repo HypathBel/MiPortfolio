@@ -266,4 +266,125 @@
    */
   new PureCounter();
 
+  /**
+   * Theme toggle (light / dark)
+   */
+  const themeToggle = select('#theme-toggle')
+  if (themeToggle) {
+    const applyTheme = (theme) => {
+      document.documentElement.setAttribute('data-theme', theme)
+      const icon = themeToggle.querySelector('i')
+      if (icon) {
+        icon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars'
+      }
+    }
+    const systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)')
+    const getInitialTheme = () => {
+      let stored = null
+      try {
+        stored = localStorage.getItem('theme')
+      } catch (e) {}
+      if (stored) return stored
+      return (systemDark && systemDark.matches) ? 'dark' : 'light'
+    }
+    applyTheme(getInitialTheme())
+    on('click', '#theme-toggle', function() {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+      try {
+        localStorage.setItem('theme', next)
+      } catch (e) {}
+      applyTheme(next)
+    })
+    if (systemDark && systemDark.addEventListener) {
+      systemDark.addEventListener('change', (e) => {
+        let stored = null
+        try {
+          stored = localStorage.getItem('theme')
+        } catch (err) {}
+        if (!stored) applyTheme(e.matches ? 'dark' : 'light')
+      })
+    }
+  }
+
+  /**
+   * Scroll progress bar
+   */
+  const scrollProgress = select('#scroll-progress')
+  const updateScrollProgress = () => {
+    if (!scrollProgress) return
+    const doc = document.documentElement
+    const scrollTop = window.scrollY || doc.scrollTop
+    const height = doc.scrollHeight - doc.clientHeight
+    scrollProgress.style.width = (height > 0 ? (scrollTop / height) * 100 : 0) + '%'
+  }
+  window.addEventListener('load', updateScrollProgress)
+  onscroll(document, updateScrollProgress)
+
+  /**
+   * Footer year
+   */
+  const yearEl = select('#year')
+  if (yearEl) {
+    yearEl.textContent = new Date().getFullYear()
+  }
+
+  /**
+   * Contact form: PHP with mailto fallback
+   */
+  const contactForm = select('#contact_form')
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault()
+      const form = this
+      const loading = form.querySelector('.loading')
+      const errorMsg = form.querySelector('.error-message')
+      const sentMsg = form.querySelector('.sent-message')
+
+      if (loading) loading.classList.add('d-block')
+      if (errorMsg) errorMsg.classList.remove('d-block')
+      if (sentMsg) sentMsg.classList.remove('d-block')
+
+      const action = form.getAttribute('action')
+      const formData = new FormData(form)
+
+      const mailtoFallback = () => {
+        if (loading) loading.classList.remove('d-block')
+        const name = form.querySelector('[name=name]').value
+        const email = form.querySelector('[name=email]').value
+        const subject = form.querySelector('[name=subject]').value
+        const message = form.querySelector('[name=message]').value
+        const mailto = 'mailto:isabelvillegas915@gmail.com' +
+          '?subject=' + encodeURIComponent(subject || 'Contact from portfolio') +
+          '&body=' + encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + message)
+        if (sentMsg) {
+          sentMsg.textContent = 'Opening your email app so you can send it manually...'
+          sentMsg.classList.add('d-block')
+        }
+        window.location.href = mailto
+      }
+
+      fetch(action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      })
+        .then(response => response.text())
+        .then(data => {
+          if (loading) loading.classList.remove('d-block')
+          if (data.trim() === 'OK') {
+            if (sentMsg) {
+              sentMsg.textContent = 'Your message has been sent. Thank you!'
+              sentMsg.classList.add('d-block')
+            }
+            form.reset()
+          } else {
+            throw new Error(data || 'Form submission failed')
+          }
+        })
+        .catch(() => {
+          mailtoFallback()
+        })
+    })
+  }
+
 })()
